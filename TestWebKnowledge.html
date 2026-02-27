@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Report</title>
+    <style>
+        body {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        .weather-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .cityinput {
+            width: 250px;
+            padding: 12px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .cityinput::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cityinput:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            background-color: rgb(226, 226, 236);
+            color: #4facfe;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.01);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+        }
+
+        h2 {
+            margin: 20px 0 5px 0;
+            font-size: 2rem;
+        }
+
+        p {
+            margin: 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="weather-card">
+        <h1>Welcome!</h1>
+        <input type="text" id="city" class="cityinput"
+            style="font-weight: bold; background-color: rgb(32, 75, 98); color: white;" placeholder="Enter City">
+        <button onclick="getWeather()">Get Weather</button>
+
+        <div id="result">
+            <h2 id="temp"></h2>
+            <p id="desc"></p>
+        </div>
+    </div>
+
+    <script>
+        function getWeather() {
+            const apiKey = "eff12e4e35412551aada4091ad755e1c";
+            const city = document.getElementById("city").value;
+
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+                .then(response => response.json())
+                .then(data => { 
+                    if (data.cod == 200) {
+                        document.getElementById("temp").innerText = data.main.temp + "°C";
+                        document.getElementById("desc").innerText = data.weather[0].description;
+                        const utc = data.dt * 1000 + (new Date().getTimezoneOffset() * 60000);
+
+                        const cityTime = new Date(utc + (1000 * data.timezone));
+
+                        const timeStr = cityTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                        document.getElementById("desc").innerText += " | Local Time: " + timeStr
+
+                        if (timeStr >= "06:00:00" && timeStr < "18:00:00") {
+                            document.body.style.background = "linear-gradient(180deg, #4facfe 0%, #00f2fe 100%)";
+                        } else {
+                            document.body.style.background = "linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%)";
+                        }
+                    } else {
+                        alert("City not found");
+                    }
+                })
+                .catch(error => console.log(error));
+        }
+    </script>
+</body>
+
+</html>
